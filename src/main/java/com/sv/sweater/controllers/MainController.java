@@ -1,4 +1,4 @@
-package com.sv.sweater;
+package com.sv.sweater.controllers;
 
 import com.sv.sweater.domain.Message;
 import com.sv.sweater.repositories.MessageRepo;
@@ -9,11 +9,10 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import java.util.List;
 import java.util.Map;
 
 @Controller
-public class GreetingController {
+public class MainController {
 
     @Autowired
     private MessageRepo messageRepo;
