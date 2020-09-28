@@ -27,7 +27,9 @@ public class User implements UserDetails {
     @Enumerated(EnumType.STRING)
     private Set<Role> roles;
 
-    public boolean
+    public boolean isAdmin(){
+        return roles.contains(Role.ADMIN); //Для security.ftlh для сокрытия элементов не админам
+    }
 
     public Long getId() {
         return id;

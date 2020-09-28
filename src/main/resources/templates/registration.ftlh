@@ -2,7 +2,7 @@
 <#import "parts/login.ftlh" as l>
 
 <@c.page>
-Registrarion:
+    <div class="mb-1">  Registration:</div>
 ${message!""}
-    <@l.login "/registration" />
+    <@l.login "/registration" true/>
 </@c.page>
