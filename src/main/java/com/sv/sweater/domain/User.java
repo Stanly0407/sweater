@@ -27,6 +27,7 @@ public class User implements UserDetails {
     @Enumerated(EnumType.STRING)
     private Set<Role> roles;
 
+    public boolean
 
     public Long getId() {
         return id;
