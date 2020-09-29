@@ -31,7 +31,7 @@
                 </div>
                 <input type="hidden" name="_csrf" value="${_csrf.token}"/>
                 <div class="form-group">
-                    <button class="btn btn-primary" type="submit">Добавить</button>
+                    <button class="btn btn-primary" type="submit">Add</button>
                 </div>
             </form>
         </div>
