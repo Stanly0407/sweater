@@ -25,8 +25,9 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         http
                 .authorizeRequests()
                 .antMatchers("/", "/registration",
-                        "/static/**" // чтобы статические ресурсы раздавались без авторизации
-                        ).permitAll()
+                        "/static/**", // чтобы статические ресурсы раздавались без авторизации (и др. здесь указ. без автор.)
+                        "/activate/*"
+                ).permitAll()
                 .anyRequest().authenticated()
                 .and()
                 .formLogin()
@@ -42,8 +43,6 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         auth.userDetailsService(userService)
                 .passwordEncoder(NoOpPasswordEncoder.getInstance());
     }
-
-
 
 
 }

@@ -34,6 +34,14 @@ public class RegistrationController {
     // обработка подтверждения аккаунта пользователя
     @GetMapping("/activate/{code}")
     public String activate(Model model, @PathVariable String code){
+        boolean isActivated = userService.activateUser(code);
+        // сообщаем юзеру о том как прошла активация
+        if (isActivated) {
+            model.addAttribute("massage", "User successfully activated.");
+                    } else {
+            model.addAttribute("massage", "Activation code is not found!");
+        }
+
         return "login";
     }
 

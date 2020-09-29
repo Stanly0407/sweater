@@ -50,4 +50,15 @@ public class UserService implements UserDetailsService {
         return true;
     }
 
+    public boolean activateUser(String code) {
+        // далее метод кот. будет искать юзера в репо по активационному коду:
+        User user = userRepo.findByActivationCode(code);
+
+        if (user == null){ //если юзер не найдет = активация не удалась;
+            return false;
+        }
+        user.setActivationCode(null); // значит пользователь подтвердил свой ящик
+        userRepo.save(user);
+        return true;
+    }
 }

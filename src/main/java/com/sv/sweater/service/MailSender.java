@@ -12,14 +12,14 @@ public class MailSender {
     @Autowired
     private JavaMailSender mailSender;
 
-    @Value("${spring.mail.username}") // нчтобы мы могли указать ниже в setFrom отправителя
+    @Value("${spring.mail.username}") // чтобы мы могли указать ниже в setFrom отправителя
     private String username;
 
     //метод, кот. будет рассылать почту
     public void send(String emailTo, String subject, String message){
         SimpleMailMessage mailMessage = new SimpleMailMessage();
 
-        mailMessage.setFrom(username;
+        mailMessage.setFrom(username);
         mailMessage.setTo(emailTo);
         mailMessage.setSubject(subject);
         mailMessage.setText(message);
