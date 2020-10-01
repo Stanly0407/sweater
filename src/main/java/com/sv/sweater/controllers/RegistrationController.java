@@ -37,9 +37,9 @@ public class RegistrationController {
         boolean isActivated = userService.activateUser(code);
         // сообщаем юзеру о том как прошла активация
         if (isActivated) {
-            model.addAttribute("massage", "User successfully activated.");
+            model.addAttribute("message", "User successfully activated.");
                     } else {
-            model.addAttribute("massage", "Activation code is not found!");
+            model.addAttribute("message", "Activation code is not found!");
         }
 
         return "login";

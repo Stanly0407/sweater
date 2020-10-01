@@ -22,6 +22,12 @@
                 <a class="nav-link" href="/user">User list </a>
             </li>
             </#if>
+            <#if user??>
+<#-- в секьюрити темплэйтc мы описываем user только в том случае, если он авторизован-->
+                <li class="nav-item">
+                    <a class="nav-link" href="/user/profile">Profile</a>
+                </li>
+            </#if>
         </ul>
         <div class="navbar-text mr-3">${name}</div>
         <@l.logout />
