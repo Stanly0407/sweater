@@ -8,11 +8,13 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.validation.Valid;
 import java.io.File;
 import java.io.IOException;
 import java.util.Map;
@@ -51,26 +53,31 @@ public class MainController {
     @PostMapping("/main")
     public String add(
             @AuthenticationPrincipal User user,
-            @RequestParam String text,
-            @RequestParam String tag, Map<String, Object> model,
-            @RequestParam("file") MultipartFile file ) throws IOException
-            {
-        Message message = new Message(text, tag, user);
-        if(file != null && !file.getOriginalFilename().isEmpty()){
-            File uploadDir = new File(uploadPath);
-            if(!uploadDir.exists()){ //если директории нет - то ее создаст
-                uploadDir.mkdir();
+            @Valid Message message, //аннотация кот. запускает валидацию
+            BindingResult bindingResult, //список аргументов и сообщений ошибок валидации
+            //!!!!!!! Данные выше аргументы ВСЕГДА д. идти выше Model! Иначе ошибки валидации попадут в представление
+            Model model,
+            @RequestParam("file") MultipartFile file) throws IOException {
+        message.setAuthor(user);
+        if (bindingResult.hasErrors()) {
+
+        } else { // если bindingResult не содержит ошибок, то тогда БД сохраняет результат
+            if (file != null && !file.getOriginalFilename().isEmpty()) {
+                File uploadDir = new File(uploadPath);
+                if (!uploadDir.exists()) { //если директории нет - то ее создаст
+                    uploadDir.mkdir();
+                }
+                // создаем уникальное имя файла, чтобы обезопасить себя от коллизий:
+                String uuidFile = UUID.randomUUID().toString();
+                String resultFileName = uuidFile + "." + file.getOriginalFilename();
+                file.transferTo(new File(uploadPath + "/" + resultFileName));
+                message.setFilename(resultFileName);
             }
-            // создаем уникальное имя файла, чтобы обезопасить себя от коллизий:
-            String uuidFile = UUID.randomUUID().toString();
-            String resultFileName = uuidFile + "." + file.getOriginalFilename();
-            file.transferTo(new File(uploadPath + "/" + resultFileName));
-            message.setFilename(resultFileName);
+            messageRepo.save(message);
         }
 
-        messageRepo.save(message);
         Iterable<Message> messages = messageRepo.findAll();
-        model.put("messages", messages);
+        model.addAttribute("messages", messages);
         return "main";
     }
 
