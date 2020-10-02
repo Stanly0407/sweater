@@ -16,7 +16,8 @@
         <div class="form-group row">
             <label class="col-sm-2 col-form-label">Password: </label>
             <div class="col-sm-5">
-                <input class="form-control ${(passwordError??)?string('is-invalid', '')}" type="password" name="password" placeholder="Password"/>
+                <input class="form-control ${(passwordError??)?string('is-invalid', '')}" type="password"
+                       name="password" placeholder="Password"/>
                 <#if passwordError??>
                     <div class="invalid-feedback">
                         ${passwordError}
@@ -28,7 +29,8 @@
             <div class="form-group row">
                 <label class="col-sm-2 col-form-label">Password: </label>
                 <div class="col-sm-5">
-                    <input class="form-control ${(password2Error??)?string('is-invalid', '')}" type="password" name="password2"
+                    <input class="form-control ${(password2Error??)?string('is-invalid', '')}" type="password"
+                           name="password2"
                            placeholder="Retype Password"/>
                     <#if password2Error??>
                         <div class="invalid-feedback">
@@ -42,13 +44,23 @@
                 <label class="col-sm-2 col-form-label">Email: </label>
                 <div class="col-sm-5">
                     <input class="form-control ${(emailError??)?string('is-invalid', '')}"
-                           value="<#if user??>${user.email}</#if>" type="email" name="email" placeholder="some@some.com"/>
+                           value="<#if user??>${user.email}</#if>" type="email" name="email"
+                           placeholder="some@some.com"/>
                     <#if emailError??>
                         <div class="invalid-feedback">
                             ${emailError}
                         </div>
                     </#if>
                 </div>
+            </div>
+            <div class="col-sm-5">
+<#--                ключ в HTML-коде, который сайт передает на устройства пользователей.-->
+                <div class="g-recaptcha" data-sitekey="6Le_6tIZAAAAADjTgMj756I66gQQXmuRnzhhLK5J"></div>
+                <#if captchaError??>
+                    <div class="alert alert-danger" role="alert">
+                        ${captchaError}
+                    </div>
+                </#if>
             </div>
         </#if>
         <input type="hidden" name="_csrf" value="${_csrf.token}"/>
