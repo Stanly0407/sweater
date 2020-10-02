@@ -25,9 +25,9 @@ public class User implements UserDetails {
     @NotBlank(message = "Password cannot be empty!")
     private String password;
 
-    @Transient // чтобы хиберн. не искал в БД
-    @NotBlank(message = "Password confirmation cannot be empty!") //подтвержд.внесенного пароля
-    private String password2;
+//    @Transient // чтобы хиберн. не искал в БД
+//    @NotBlank(message = "Password confirmation cannot be empty!") //подтвержд.внесенного пароля
+//    private String password2;
 
     private boolean active;
     @Email(message = "Email is not correct!")
@@ -126,11 +126,4 @@ public class User implements UserDetails {
         this.activationCode = activationCode;
     }
 
-    public String getPassword2() {
-        return password2;
-    }
-
-    public void setPassword2(String password2) {
-        this.password2 = password2;
-    }
 }
