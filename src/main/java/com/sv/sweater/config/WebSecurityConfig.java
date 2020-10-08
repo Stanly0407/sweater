@@ -27,10 +27,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
-    @Bean
-    public PasswordEncoder getPasswordEncoder(){
-        return new BCryptPasswordEncoder(8); //8 - параметр страницы, кот. хар-т надежность ключа
-    }
+
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
