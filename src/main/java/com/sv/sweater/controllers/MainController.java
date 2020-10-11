@@ -102,6 +102,10 @@ public class MainController {
             @RequestParam(required = false) Message message
             ) {
         Set<Message> messages = user.getMessages(); //получаем месседжи и кладем в модель
+        model.addAttribute("userChannel", user);
+        model.addAttribute("subscriptionsCount", user.getSubscriptions().size());
+        model.addAttribute("subscribersCount", user.getSubscribers().size());
+        model.addAttribute("isSubscriber", user.getSubscribers().contains(currentUser)); //определяем явл. ли текущий юзеро подписчиком того юзера на страницу кот. он зашел
         model.addAttribute("messages", messages);
         model.addAttribute("message", message);
         model.addAttribute("isCurrentUser", currentUser.equals(user));
