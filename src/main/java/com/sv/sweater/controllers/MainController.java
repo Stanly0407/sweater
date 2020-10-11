@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.util.StringUtils;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -34,7 +35,6 @@ public class MainController {
 
     @GetMapping("/")
     public String greeting(Map<String, Object> model) {
-
         return "greeting";
     }
 
@@ -68,20 +68,10 @@ public class MainController {
             Map<String, String> errorsMap = ControllerUtils.getErrors(bindingResult);
             model.mergeAttributes(errorsMap);  // ошибка отобразится в представлении - см. main.ftlh
             model.addAttribute("message", message);
-        } else { // если bindingResult не содержит ошибок, то тогда БД сохраняет результат
-            if (file != null && !file.getOriginalFilename().isEmpty()) {
-                File uploadDir = new File(uploadPath);
-                if (!uploadDir.exists()) { //если директории нет - то ее создаст
-                    uploadDir.mkdir();
-                }
-                // создаем уникальное имя файла, чтобы обезопасить себя от коллизий:
-                String uuidFile = UUID.randomUUID().toString();
-                String resultFileName = uuidFile + "." + file.getOriginalFilename();
-                file.transferTo(new File(uploadPath + "/" + resultFileName));
-                message.setFilename(resultFileName);
-            }
+        } else {
+            saveFile(message, file);// сохраняем файл. если bindingResult не содержит ошибок, то тогда БД сохраняет результат
             model.addAttribute("message", null); // в случае если валидация прошла успешно- удалит из модели месседж, иначе
-        //    после добавления мы получим открытую форму с сообщением
+            //    после добавления мы получим открытую форму с сообщением
             messageRepo.save(message);
         }
 
@@ -90,16 +80,57 @@ public class MainController {
         return "main";
     }
 
+    public void saveFile(@Valid Message message, @RequestParam("file") MultipartFile file) throws IOException {
+        if (file != null && !file.getOriginalFilename().isEmpty()) {
+            File uploadDir = new File(uploadPath);
+            if (!uploadDir.exists()) { //если директории нет - то ее создаст
+                uploadDir.mkdir();
+            }
+            // создаем уникальное имя файла, чтобы обезопасить себя от коллизий:
+            String uuidFile = UUID.randomUUID().toString();
+            String resultFileName = uuidFile + "." + file.getOriginalFilename();
+            file.transferTo(new File(uploadPath + "/" + resultFileName));
+            message.setFilename(resultFileName);
+        }
+    }
+
     @GetMapping("/user-messages/{user}")
     public String userMessages(
             @AuthenticationPrincipal User currentUser,
             @PathVariable User user,
-            Model model
-    ){
-       Set<Message> messages = user.getMessages(); //получаем месседжи и кладем в модель
-       model.addAttribute("messages", messages);
-       model.addAttribute("isCurrentUser", currentUser.equals(user));
+            Model model,
+            @RequestParam(required = false) Message message
+            ) {
+        Set<Message> messages = user.getMessages(); //получаем месседжи и кладем в модель
+        model.addAttribute("messages", messages);
+        model.addAttribute("message", message);
+        model.addAttribute("isCurrentUser", currentUser.equals(user));
         return "userMessages";
+    }
+
+    @PostMapping("/user-messages/{user}")
+    public String updateMessage(
+            @AuthenticationPrincipal User currentUser,
+            @PathVariable Long user,
+            @RequestParam("id") Message message,
+            @RequestParam("text") String text,
+            @RequestParam("tag") String tag,
+            @RequestParam("file") MultipartFile file
+    ) throws IOException {
+        //проверка безопасности, чтоб юзер мог менять только свои сообщения
+        if (message.getAuthor().equals(currentUser)) {
+            //проверка на непустое поле
+            if (!StringUtils.isEmpty(text)) {
+                message.setText(text);
+            }
+            if (!StringUtils.isEmpty(tag)) {
+                message.setTag(tag);
+            }
+            saveFile(message, file);
+            messageRepo.save(message);
+        }
+
+        return "redirect:/user-messages/" + user;
     }
 
 }
