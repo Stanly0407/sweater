@@ -65,6 +65,40 @@ public class UserController {
         return "redirect:/user/profile";
     }
 
+    @GetMapping("subscribe/{user}")
+    public String subscribe(
+            @PathVariable User user,
+            @AuthenticationPrincipal User currentUser
+    ){
+        userService.subscribe(currentUser, user);
+        return "redirect:/user-messages/" + user.getId();
+    }
 
+    @GetMapping("unsubscribe/{user}")
+    public String unsubscribe(
+            @PathVariable User user,
+            @AuthenticationPrincipal User currentUser
+    ){
+        userService.unsubscribe(currentUser, user);
+        return "redirect:/user-messages/" + user.getId();
+    }
+    @GetMapping("{type}/{user}/list")
+    public String userList(
+            Model model,
+            @PathVariable User user,
+            @PathVariable String type
+    ){
+        model.addAttribute("userChannel", user);
+        model.addAttribute("type", type);
+
+        //Выводим список в зависимости от того, подписчики это или подписки
+        if("subscriptions".equals(type)){
+            model.addAttribute("users", user.getSubscriptions());
+        }else{
+            model.addAttribute("users", user.getSubscribers());
+        }
+
+        return "subscriptions";
+    }
 
 }
