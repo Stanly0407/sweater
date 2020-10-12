@@ -29,20 +29,27 @@ public class LoginTest {
     private MainController controller;
 
     @Test // аннотация помечает  тестовые методы
-    public void test() throws Exception {
+    public void contextLoads() throws Exception {
         this.mockMvc.perform(get("/")) //вызываем у mockMVC метод perform, которым показываем,
                 // что мы хотим выполнить get запрос - / на главную стр проекта.
                 .andDo(print())               // будет выводить полученный результат в консоль - м.б. поломки.
                 .andExpect(status().isOk())   // обертка наж assertThat методом - позволяет сравнить результат,
                 // кот. возвращается с тестируемым кодом с тем рез-том, кот. мы ожидаем
                 // И бросит исключение если что-то не так. И здесь мы ожидаем код возврата на http - 200
-                .andExpect(content().string(containsString("Hello, guest!")));
+                .andExpect(content().string(containsString("Hello, guest!")))
         //проверяем что вернеться какой-то контент. И этот контент мы как строку сравниваем что
         // содержит в себе подстроку
-
+                .andExpect(content().string(containsString("Please, sign in")));
     }
 
     @Test
+    public void loginTest() throws Exception {
+     // метод для проверкт авторизации
+        this.mockMvc.perform(get("/main")) //адрес странички, кот.  требует авторизации
+        .andDo(print())
+                .andExpect(status().is3xxRedirection()) // проверяем, что система ожидает статус отличный от 200
+                .  //что система нам подкинет необходимый адрес
+    }
 }
 
 
