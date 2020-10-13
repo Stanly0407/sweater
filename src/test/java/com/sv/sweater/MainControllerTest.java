@@ -21,8 +21,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 @AutoConfigureMockMvc
 @WithUserDetails("Admin") // м. перед методом указывать, как и ост. ниже аннотации
-@TestPropertySource("application-test.properties")
-@Sql() //т.к. БД для тестов пустая - наполним
+@TestPropertySource("/application-test.properties")
+@Sql(value = {"/create-user-before.sql"}, executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD) //т.к. БД для тестов пустая - наполним
+@Sql(value = {"/create-user-after.sql"}, executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
 public class MainControllerTest {
     @Autowired
     private MockMvc mockMvc;
