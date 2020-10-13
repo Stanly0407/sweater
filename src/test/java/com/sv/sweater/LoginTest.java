@@ -10,10 +10,11 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 
 import static org.hamcrest.core.StringContains.containsString;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestBuilders.formLogin;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 
 @RunWith(SpringRunner.class)
@@ -43,13 +44,31 @@ public class LoginTest {
     }
 
     @Test
-    public void loginTest() throws Exception {
+    public void accessDeniedTest() throws Exception {
      // метод для проверкт авторизации
         this.mockMvc.perform(get("/main")) //адрес странички, кот.  требует авторизации
-        .andDo(print())
-                .andExpect(status().is3xxRedirection()) // проверяем, что система ожидает статус отличный от 200
-                .  //что система нам подкинет необходимый адрес
+                    .andDo(print())
+                    .andExpect(status().is3xxRedirection()) // проверяем, что система ожидает статус отличный от 200
+                    .andExpect(redirectedUrl("http://localhost/login"));  //что система нам подкинет необходимый адрес
     }
+
+    @Test
+    public void correctLoginTest() throws Exception{ //проверяем авторизацию пользователя
+        this.mockMvc.perform(formLogin().user("Admin").password("a"))  //(зависимости спец.) Метод смотрит как мы в контексте определили login page и вызывает обращение к этой страничке
+                    .andDo(print())
+                    .andExpect(status().is3xxRedirection())
+                    .andExpect(redirectedUrl("/"));
+    }
+
+      //проверка, что у нас отрабатывает отбивка на неверные данные юзера
+    @Test
+    public void badCredentials() throws Exception{
+        this.mockMvc.perform(post("/login").param("user","Alyona"))
+                .andDo(print()) // в консоль то что у нас вернул сервер
+                .andExpect(status().isForbidden()); //ожидаем статус
+    }
+
+
 }
 
 
