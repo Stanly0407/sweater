@@ -22,8 +22,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc
 @WithUserDetails("Admin") // м. перед методом указывать, как и ост. ниже аннотации
 @TestPropertySource("/application-test.properties")
-@Sql(value = {"/create-user-before.sql"}, executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD) //т.к. БД для тестов пустая - наполним
-@Sql(value = {"/create-user-after.sql"}, executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
+@Sql(value = {"/create-user-before.sql", "/messages-list-before.sql"}, executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD) //т.к. БД для тестов пустая - наполним
+@Sql(value = {"/messages-list-after.sql", "/create-user-after.sql" }, executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD) // в обратном порядке
 public class MainControllerTest {
     @Autowired
     private MockMvc mockMvc;
@@ -48,9 +48,12 @@ public class MainControllerTest {
         this.mockMvc.perform(get("/main"))
                 .andDo(print())
                 .andExpect(authenticated()) // снова проверяем, что пользователь аутентифицирован
-                .andExpect(xpath("").nodeCount(0)); //ожидаем, что возвращ. будет не строку, а кол-во узлов
+                .andExpect(xpath("//div[@id='message-list']/div").nodeCount(4)); //ожидаем, что возвращ. будет не строку, а кол-во узлов
         // на практике для таких тестов удобнее иметь БД для тестов - создаем, см. application-test.properties и необх. аннотация @TestPropertySource
 
     }
+
+    @Test
+    public void filterMessageTest()
 
 }
