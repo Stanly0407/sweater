@@ -2,7 +2,7 @@
 
 <div class="card-columns" id="message-list"> <#-- id для тестов, xpath-->
     <#list messages as message>
-        <div class="card my-3" >
+        <div class="card my-3" data-id="${message.id}"> <#-- data-id=""${message.id} - уник id выводим для тестирования-->
             <#if message.filename??>
                 <img alt="uploading..." src="/img/${message.filename}" class="card-img-top" />
             </#if>
