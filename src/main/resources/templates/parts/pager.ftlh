@@ -17,13 +17,17 @@
     <div class="mt-3">
         <ul class="pagination">
             <li class="page-item disabled">
-                <a class="page-link" href="#" tabindex="-1">Page</a>
+                <a class="page-link" href="#" tabindex="-1">Pages</a>
             </li>
-            <#list 1..page.getTotalPages() as p>
+            <#list body as p>
 <#--                проверка чтобы ссылка была не на активную страницу:  -->
                 <#if (p - 1) == page.getNumber()> <#-- -1 = чтобы нулевая страница отображалась-->
                 <li class="page-item active">
                     <a class="page-link" href="#" tabindex="-1">${p}</a>
+                </li>
+                <#elseif p == -1>
+                <li class="page-item disabled">
+                    <a class="page-link" href="#" tabindex="-1">...</a>
                 </li>
                 <#else>
                     <li class="page-item">
