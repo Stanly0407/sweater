@@ -4,10 +4,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.data.web.PageableHandlerMethodArgumentResolver;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.ViewControllerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+
+import java.util.List;
 
 @Configuration
 public class MvcConfig implements WebMvcConfigurer {
@@ -32,5 +36,12 @@ public class MvcConfig implements WebMvcConfigurer {
         // classpath: - ищет в директории проекта, file:  - ищнт в системе (но мне не помогло и пришлось путь писать выше полностью)
     }
 
+    @Override // Чтобы  <#if (p - 1) == page.getNumber()> в pager  работал корректно и страницы не с 0 считались
+    public void addArgumentResolvers(List<HandlerMethodArgumentResolver> argumentResolvers) {
+        PageableHandlerMethodArgumentResolver resolver = new PageableHandlerMethodArgumentResolver();
+        resolver.setOneIndexedParameters(true);
+        argumentResolvers.add(resolver);
+        WebMvcConfigurer.super.addArgumentResolvers(argumentResolvers);
+    }
 
 }
