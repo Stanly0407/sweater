@@ -21,11 +21,7 @@ public class SimpleTest {
     @Test(expected = ArithmeticException.class)
     public void error(){
         int i = 0;
-
         int il = 1 / i;
-
-
-
     }
 
 
