@@ -1,15 +1,21 @@
 package com.sv.sweater.service;
 
+import com.sv.sweater.domain.Role;
 import com.sv.sweater.domain.User;
 import com.sv.sweater.repositories.UserRepo;
+import org.hamcrest.CoreMatchers;
 import org.junit.Assert;
 import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
+import org.mockito.ArgumentMatchers;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.junit4.SpringRunner;
+
+import java.util.Collections;
 
 
 @RunWith(SpringRunner.class)
@@ -31,9 +37,27 @@ class UserServiceTest {
     @Test
     void addUser() {
         User user = new User();
+
+        user.setEmail("some@mail.ru");
+
         boolean isUserCreated = userService.addUser(user);
 
         Assert.assertTrue(isUserCreated); // Тест будет проверять то, что пользователь успешно создан
+        Assert.assertNotNull(user.getActivationCode()); //проверяем задан ли активационный код
+        Assert.assertTrue(CoreMatchers.is(user.getRoles()).matches(Collections.singleton(Role.USER))); //проверяем, задана ли роль
+        // Проверка сохранен ли пользователь и что ему выполнена отправка сообщения
+        Mockito.verify(userRepo, Mockito.times(1)).save(user);
+        Mockito.verify(mailSender, Mockito.times(1))
+                .send(
+                        ArgumentMatchers.eq(user.getEmail()),
+                        ArgumentMatchers.eq("Activation code"),
+                        ArgumentMatchers.contains("Welcome to Sweater.")
+                        //  ArgumentMatchers.anyString() ----можно и так
 
+                );
     }
+    // но м.б. случаи, когда юзер в БД уже имеется => создаем тест
+
+
+
 }
