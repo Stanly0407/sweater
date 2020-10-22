@@ -1,6 +1,6 @@
 package com.sv.sweater;
 
-import com.sv.sweater.controllers.MainController;
+import com.sv.sweater.controllers.MessageController;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,7 +31,7 @@ public class LoginTest {
 
     // По гайду заинжектить контроллер
     @Autowired
-    private MainController controller;
+    private MessageController controller;
 
     @Test // аннотация помечает  тестовые методы
     public void contextLoads() throws Exception {

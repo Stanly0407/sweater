@@ -3,6 +3,7 @@ package com.sv.sweater.controllers;
 import com.sv.sweater.domain.Message;
 import com.sv.sweater.domain.User;
 import com.sv.sweater.repositories.MessageRepo;
+import com.sv.sweater.service.MessageService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
@@ -29,10 +30,13 @@ import java.util.UUID;
 
 
 @Controller
-public class MainController {
+public class MessageController {
 
     @Autowired
     private MessageRepo messageRepo;
+
+    @Autowired
+    private MessageService messageService;
 
     @Value("${upload.path}") // ищет в пропертис путь и вставляет в переменную
     private String uploadPath;
@@ -51,7 +55,7 @@ public class MainController {
             тем более, что список может быть очень длинным, что негативно скажется работе браузера и сервера.
             В такой ситуации используется постраничный вывод данных (пагинация, pagination).*/
             ) {
-        Page<Message> page;
+        Page<Message> page = messageService.messageList(pageable, filter);
 
         if (filter != null && !filter.isEmpty()) {
             page = messageRepo.findByTag(filter, pageable);
@@ -106,21 +110,23 @@ public class MainController {
         }
     }
 
-    @GetMapping("/user-messages/{user}")
+    @GetMapping("/user-messages/{author}")
     public String userMessages(
             @AuthenticationPrincipal User currentUser,
-            @PathVariable User user,
+            @PathVariable User author,
             Model model,
-            @RequestParam(required = false) Message message
+            @RequestParam(required = false) Message message,
+            @PageableDefault(sort = {"id"}, direction = Sort.Direction.DESC) Pageable pageable
             ) {
-        Set<Message> messages = user.getMessages(); //получаем месседжи и кладем в модель
-        model.addAttribute("userChannel", user);
-        model.addAttribute("subscriptionsCount", user.getSubscriptions().size());
-        model.addAttribute("subscribersCount", user.getSubscribers().size());
-        model.addAttribute("isSubscriber", user.getSubscribers().contains(currentUser)); //определяем явл. ли текущий юзеро подписчиком того юзера на страницу кот. он зашел
-        model.addAttribute("messages", messages);
+        Page<Message> page = messageService.messageListForUser(pageable, currentUser, author); //получаем месседжи и кладем в модель
+        model.addAttribute("userChannel", author);
+        model.addAttribute("subscriptionsCount", author.getSubscriptions().size());
+        model.addAttribute("subscribersCount", author.getSubscribers().size());
+        model.addAttribute("isSubscriber", author.getSubscribers().contains(currentUser)); //определяем явл. ли текущий юзеро подписчиком того юзера на страницу кот. он зашел
+        model.addAttribute("page", page);
         model.addAttribute("message", message);
-        model.addAttribute("isCurrentUser", currentUser.equals(user));
+        model.addAttribute("isCurrentUser", currentUser.equals(author));
+        model.addAttribute("url", "/user-messages" + author.getId());
         return "userMessages";
     }
 
