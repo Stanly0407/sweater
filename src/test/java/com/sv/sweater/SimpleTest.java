@@ -16,4 +16,17 @@ public class SimpleTest {
         Assert.assertEquals(46, x * y); //сначала пишем результат, который хотим получить!
         Assert.assertEquals(25, x + y);
     }
+
+    // тестирование exception
+    @Test(expected = ArithmeticException.class)
+    public void error(){
+        int i = 0;
+
+        int il = 1 / i;
+
+
+
+    }
+
+
 }
