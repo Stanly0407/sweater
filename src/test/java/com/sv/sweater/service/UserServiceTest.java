@@ -53,7 +53,6 @@ class UserServiceTest {
                         ArgumentMatchers.eq("Activation code"),
                         ArgumentMatchers.contains("Welcome to Sweater.")
                         //  ArgumentMatchers.anyString() ----можно и так
-
                 );
     }
     // но м.б. случаи, когда юзер в БД уже имеется => создаем тест
@@ -71,8 +70,36 @@ class UserServiceTest {
 
         boolean isUserCreated = userService.addUser(user);
 
-        Assert.assertFalse(isUserCreated);
+        Assert.assertFalse(isUserCreated); // то есть здесь вернулось false, когда мы попытались добавить юзера, кот. есть в БД
 
+        // Проверка, что у нас не отправляет метод никаких сообщений и не происходит сохранение этого юзера в БД
+        // Проверка сохранен ли пользователь и что ему выполнена отправка сообщения
+        Mockito.verify(userRepo, Mockito.times(0)).save(ArgumentMatchers.any(User.class));
+        Mockito.verify(mailSender, Mockito.times(0))
+                .send(
+                        ArgumentMatchers.anyString(),
+                        ArgumentMatchers.anyString(),
+                        ArgumentMatchers.anyString()
+                );
     }
+
+    @Test
+    void activateUser() {
+        User user = new User();
+
+        user.setActivationCode("some activation code");
+        Mockito.doReturn(new User())
+                .when(userRepo)
+                .findByActivationCode("activate");
+
+        boolean isUserActivated = userService.activateUser("activate");
+
+        Assert.assertTrue(isUserActivated);
+        Assert.assertNull(user.getActivationCode());
+        // проверим сохраняется ли юзер
+        Mockito.verify(userRepo, Mockito.times(1)).save(user);
+    }
+
+
 
 }
