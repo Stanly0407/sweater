@@ -100,6 +100,17 @@ class UserServiceTest {
         Mockito.verify(userRepo, Mockito.times(1)).save(user);
     }
 
+    //Проверка, что активационный код не сработал
+    @Test
+    public void activateUserFailTest(){
+
+        boolean isUserActivated = userService.activateUser("activate mee");
+
+        Assert.assertFalse(isUserActivated);
+
+        Mockito.verify(userRepo, Mockito.times(0)).save(ArgumentMatchers.any(User.class));
+
+    }
 
 
 }
