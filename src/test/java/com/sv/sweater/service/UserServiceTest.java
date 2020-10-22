@@ -58,6 +58,21 @@ class UserServiceTest {
     }
     // но м.б. случаи, когда юзер в БД уже имеется => создаем тест
 
+    @Test
+    public void addUserFailTest(){
+        User user = new User();
 
+        user.setUsername("Kate");
+
+        //Эмулируем, что такой юзер в БД есть
+        Mockito.doReturn(new User())
+                .when(userRepo)
+                .findByUsername("Kate");
+
+        boolean isUserCreated = userService.addUser(user);
+
+        Assert.assertFalse(isUserCreated);
+
+    }
 
 }
