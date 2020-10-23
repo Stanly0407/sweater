@@ -17,7 +17,15 @@
             <div class="card-footer text-muted container">
                 <div class="row">
                     <a class="col align-self-center" href="/user-messages/${message.author.id}"> ${message.authorName}</a> <#--Позволит видеть сообщения конкретного пользователя-->
-                    <a class="col align-self-center" href="#"></a>
+                    <a class="col align-self-center" href="#">
+<#--                        Лайки - картинка-->
+                        <#if message.meLiked>
+                        <i class="fas fa-heart"></i>
+                            <#else>
+                        <i class="far fa-heart"></i>
+                        </#if>
+                        ${message.likes}
+                    </a>
                     <#--редактировать собственные месседжи-->
                     <#if message.author.id == currentUserId>
                         <a class="col btn btn-primary" href="/user-messages/${message.author.id}?message=${message.id}">

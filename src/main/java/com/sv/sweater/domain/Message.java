@@ -1,9 +1,12 @@
 package com.sv.sweater.domain;
 
+import com.sv.sweater.domain.util.MessageHelper;
 import org.hibernate.validator.constraints.Length;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
 public class Message {
@@ -24,6 +27,14 @@ public class Message {
 
     private String filename;
 
+    @ManyToMany
+    @JoinTable(
+            name = "messages_likes",
+            joinColumns = { @JoinColumn(name = "message_id")},
+            inverseJoinColumns = { @JoinColumn(name = "user_id")}
+    )
+    private Set<User> likes = new HashSet<>();
+
     public Message() {
     }
 
@@ -31,6 +42,10 @@ public class Message {
         this.text = text;
         this.tag = tag;
         this.author = user;
+    }
+
+    public String getAuthorName(){
+        return MessageHelper.getAuthorName(author);
     }
 
     public String getFilename() {
@@ -43,10 +58,6 @@ public class Message {
 
     public User getAuthor() {
         return author;
-    }
-
-    public String getAuthorName(){
-        return author != null ? author.getUsername() : "<none>";
     }
 
     public void setAuthor(User author) {
@@ -75,5 +86,13 @@ public class Message {
 
     public void setTag(String tag) {
         this.tag = tag;
+    }
+
+    public Set<User> getLikes() {
+        return likes;
+    }
+
+    public void setLikes(Set<User> likes) {
+        this.likes = likes;
     }
 }

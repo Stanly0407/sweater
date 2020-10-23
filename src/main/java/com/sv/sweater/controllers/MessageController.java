@@ -2,6 +2,7 @@ package com.sv.sweater.controllers;
 
 import com.sv.sweater.domain.Message;
 import com.sv.sweater.domain.User;
+import com.sv.sweater.domain.dto.MessageDto;
 import com.sv.sweater.repositories.MessageRepo;
 import com.sv.sweater.service.MessageService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,18 +15,16 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.util.StringUtils;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.Valid;
 import org.springframework.data.domain.Pageable;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.Map;
-import java.util.Set;
 import java.util.UUID;
 
 
@@ -50,18 +49,13 @@ public class MessageController {
     public String main(
             @RequestParam(required = false, defaultValue = "") String filter,
             Model model,
-            @PageableDefault(sort = {"id"}, direction = Sort.Direction.DESC) Pageable pageable
+            @PageableDefault(sort = {"id"}, direction = Sort.Direction.DESC) Pageable pageable,
             /*Зачастую, при построении сайтов и вэб приложений нет неоходимости отображать списки элементов целиком,
             тем более, что список может быть очень длинным, что негативно скажется работе браузера и сервера.
             В такой ситуации используется постраничный вывод данных (пагинация, pagination).*/
+            @AuthenticationPrincipal User user
             ) {
-        Page<Message> page = messageService.messageList(pageable, filter);
-
-        if (filter != null && !filter.isEmpty()) {
-            page = messageRepo.findByTag(filter, pageable);
-        } else {
-            page = messageRepo.findAll(pageable);
-        }
+        Page<MessageDto> page = messageService.messageList(pageable, filter, user);
 
         model.addAttribute("page", page);
         model.addAttribute("url", "/main");
@@ -118,7 +112,7 @@ public class MessageController {
             @RequestParam(required = false) Message message,
             @PageableDefault(sort = {"id"}, direction = Sort.Direction.DESC) Pageable pageable
             ) {
-        Page<Message> page = messageService.messageListForUser(pageable, currentUser, author); //получаем месседжи и кладем в модель
+        Page<MessageDto> page = messageService.messageListForUser(pageable, currentUser, author); //получаем месседжи и кладем в модель
         model.addAttribute("userChannel", author);
         model.addAttribute("subscriptionsCount", author.getSubscriptions().size());
         model.addAttribute("subscribersCount", author.getSubscribers().size());
@@ -154,5 +148,30 @@ public class MessageController {
 
         return "redirect:/user-messages/" + user;
     }
+
+    @GetMapping("/messages/{message}/like")
+    public String like(
+            @AuthenticationPrincipal User currentUser,
+            @PathVariable Message message,
+            RedirectAttributes redirectAttributes, //параметр, кот. позволит пробросить
+            @RequestHeader(required = false) String referer
+    ) {
+        Set<User> likes = message.getLikes();
+
+        if (likes.contains(currentUser)) {
+            likes.remove(currentUser);
+        } else {
+            likes.add(currentUser);
+        }
+
+        UriComponents components = UriComponentsBuilder.fromHttpUrl(referer).build();
+
+        components.getQueryParams()
+                .entrySet()
+                .forEach(pair -> redirectAttributes.addAttribute(pair.getKey(), pair.getValue()));
+
+        return "redirect:" + components.getPath();
+    }
+
 
 }
