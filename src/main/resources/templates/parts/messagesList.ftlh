@@ -17,7 +17,7 @@
             <div class="card-footer text-muted container">
                 <div class="row">
                     <a class="col align-self-center" href="/user-messages/${message.author.id}"> ${message.authorName}</a> <#--Позволит видеть сообщения конкретного пользователя-->
-                    <a class="col align-self-center" href="#">
+                    <a class="col align-self-center" href="/messages/${message.id}/like">
 <#--                        Лайки - картинка-->
                         <#if message.meLiked>
                         <i class="fas fa-heart"></i>

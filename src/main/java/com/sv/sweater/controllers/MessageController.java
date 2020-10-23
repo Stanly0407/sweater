@@ -21,10 +21,13 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.validation.Valid;
 import org.springframework.data.domain.Pageable;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import org.springframework.web.util.UriComponents;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 
 
@@ -145,7 +148,6 @@ public class MessageController {
             saveFile(message, file);
             messageRepo.save(message);
         }
-
         return "redirect:/user-messages/" + user;
     }
 
@@ -153,7 +155,7 @@ public class MessageController {
     public String like(
             @AuthenticationPrincipal User currentUser,
             @PathVariable Message message,
-            RedirectAttributes redirectAttributes, //параметр, кот. позволит пробросить
+            RedirectAttributes redirectAttributes, //параметр, кот. позволит пробросить какие-то аргументы в тот метод, в кот. будем делать редирект
             @RequestHeader(required = false) String referer
     ) {
         Set<User> likes = message.getLikes();
