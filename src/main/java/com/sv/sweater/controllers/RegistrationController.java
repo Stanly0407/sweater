@@ -41,7 +41,7 @@ public class RegistrationController {
     @PostMapping("/registration")
     public String addNewUser(
             @RequestParam("password2") String passwordConfirm,
-            @RequestParam("g-recaptcha-response") String captchaResponse, //Проверка ответа пользователя на запрос reCAPTCHA от серверной части
+            @RequestParam(value = "g-recaptcha-response", required = false) String captchaResponse, //Проверка ответа пользователя на запрос reCAPTCHA от серверной части
             // приложения. (получить токен ответа пользователя). В пропертис - секретный ключ для обмена данными между сайтом и сервисом reCAPTCHA.
             @Valid User user,
             BindingResult bindingResult,
